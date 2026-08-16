@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missing Person Finder</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}
+body{background:#0f172a;color:#fff}
+.hero{
+height:100vh;
+background:linear-gradient(rgba(0,0,0,.6),rgba(0,0,0,.6)),
+url('https://images.unsplash.com/photo-1521791136064-7986c2920216?q=80&w=1200&auto=format&fit=crop');
+background-size:cover;background-position:center;
+display:flex;align-items:center;justify-content:center;text-align:center;
+}
+.hero h1{font-size:3rem}
+.hero p{margin:15px 0}
+.btn{padding:12px 25px;background:#2563eb;color:#fff;border:none;border-radius:8px;text-decoration:none}
+.section{
+padding:50px 20px;
+background:linear-gradient(rgba(0,0,0,.7),rgba(0,0,0,.7)),
+url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop');
+background-size:cover;
+}
+.container{max-width:1100px;margin:auto}
+.card{background:rgba(255,255,255,.08);padding:20px;border-radius:15px;backdrop-filter:blur(8px)}
+input,select,textarea{
+width:100%;padding:12px;margin:8px 0;border:none;border-radius:8px
+}
+button{padding:12px 20px;border:none;border-radius:8px;background:#16a34a;color:#fff;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px;margin-top:20px}
+.case{background:#1e293b;padding:15px;border-radius:10px}
+footer{text-align:center;padding:20px;background:#020617}
+</style>
+</head>
+<body>
+
+<section class="hero">
+<div>
+<h1>Missing Person Finder</h1>
+<p>Register missing persons, upload photos & CCTV videos, and manage cases.</p>
+<a href="#register" class="btn">Register Case</a>
+</div>
+</section>
+
+<section class="section" id="register">
+<div class="container">
+<div class="card">
+<h2>Missing Person Registration</h2>
+
+<input id="name" placeholder="Full Name">
+<input id="age" type="number" placeholder="Age">
+<select id="gender">
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
+<textarea id="desc" placeholder="Description"></textarea>
+<input id="lastseen" placeholder="Last Seen Location">
+<input id="contact" placeholder="Contact Number">
+
+<label>Upload Photos</label>
+<input id="photo" type="file" multiple accept="image/*">
+
+<label>Upload CCTV Videos</label>
+<input id="video" type="file" multiple accept="video/*">
+
+<button onclick="saveCase()">Submit Case</button>
+</div>
+
+<div class="card" style="margin-top:20px">
+<h2>Search Cases</h2>
+<input id="search" placeholder="Search by Name" onkeyup="renderCases()">
+</div>
+
+<div class="grid" id="cases"></div>
+
+</div>
+</section>
+
+<footer>
+<p>Missing Person Finder System © 2026</p>
+</footer>
+
+<script>
+let cases = JSON.parse(localStorage.getItem("missingCases")||"[]");
+
+function saveCase(){
+const obj={
+name:name.value,
+age:age.value,
+gender:gender.value,
+desc:desc.value,
+lastseen:lastseen.value,
+contact:contact.value,
+photos:[...photo.files].map(f=>f.name),
+videos:[...video.files].map(f=>f.name),
+date:new Date().toLocaleString(),
+status:"Active"
+};
+
+cases.push(obj);
+localStorage.setItem("missingCases",JSON.stringify(cases));
+alert("Case Registered Successfully");
+document.querySelectorAll("input,textarea").forEach(e=>{
+if(e.type!="file") e.value="";
+});
+renderCases();
+}
+
+function renderCases(){
+const q=search.value?.toLowerCase()||"";
+casesDiv=document.getElementById("cases");
+casesDiv.innerHTML="";
+
+cases.filter(c=>c.name.toLowerCase().includes(q)).forEach(c=>{
+casesDiv.innerHTML+=`
+<div class="case">
+<h3>${c.name}</h3>
+<p><b>Age:</b> ${c.age}</p>
+<p><b>Gender:</b> ${c.gender}</p>
+<p><b>Last Seen:</b> ${c.lastseen}</p>
+<p><b>Contact:</b> ${c.contact}</p>
+<p><b>Status:</b> ${c.status}</p>
+<p><b>Photos:</b> ${c.photos.length}</p>
+<p><b>Videos:</b> ${c.videos.length}</p>
+<p>${c.desc}</p>
+</div>`;
+});
+}
+renderCases();
+</script>
+
+</body>
+</html>
